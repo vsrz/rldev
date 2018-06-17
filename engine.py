@@ -1,4 +1,6 @@
 import tcod as libtcod
+from entity import Entity
+from renderer import *
 
 def process_input(key):
     if key.vk == libtcod.KEY_UP:
@@ -25,8 +27,10 @@ def process_input(key):
 def main():
     screen_width = 80
     screen_height = 50
-    player_x = int(screen_width / 2)
-    player_y = int(screen_height / 2)
+
+    ego = Entity(int(screen_width / 2), int(screen_height / 2), '@', libtcod.white)
+    npc = Entity(int(screen_width / 2) - 5, int(screen_height / 2), '@', libtcod.yellow)
+    actors = [npc, ego]
 
     con = libtcod.console_new(screen_width, screen_height)
 
@@ -37,13 +41,11 @@ def main():
 
     while not libtcod.console_is_window_closed():
 
-        libtcod.console_set_default_foreground(con, libtcod.white)
-        libtcod.console_put_char(con, player_x, player_y, '@', libtcod.BKGND_NONE)
-        libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
-        libtcod.console_flush()
-        libtcod.console_put_char(con, player_x, player_y, ' ', libtcod.BKGND_NONE)
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
 
-        key = libtcod.console_check_for_keypress()
+        render_all(con, actors, screen_width, screen_height)
+        libtcod.console_flush()
+        clear_all(con, actors)
 
         action = process_input(key)
 
@@ -52,9 +54,7 @@ def main():
         fullscreen = action.get('fullscreen')
 
         if move:
-            dx, dy = move
-            player_x += dx
-            player_y += dy
+            ego.move(move[0],move[1])
 
         if exit:
             return True
