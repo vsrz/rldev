@@ -1,0 +1,12 @@
+*.pyc
+.idea
+.bundle
+.DS_Store
+*.gz
+*.zip
+*.log
+.eggs
+build
+dist
+*.egg-info
+
