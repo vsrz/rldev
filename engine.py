@@ -48,6 +48,7 @@ def main():
 
         if fov_recompute:
             recompute_fov(fov_map, ego.x, ego.y, fov_radius, fov_light_walls, fov_algorithm)
+            fov_recompute = False
 
         render_all(con, actors, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
         libtcod.console_flush()
@@ -64,10 +65,12 @@ def main():
             for y in range(game_map.height):
                 for x in range(game_map.width):
                     game_map.tiles[x][y].explored = True
+                    fov_recompute = True
 
 
         if move and not game_map.is_blocked(ego.x + move[0], ego.y + move[1]):
             ego.move(move[0],move[1])
+            fov_recompute = True
 
         if exit:
             return True
