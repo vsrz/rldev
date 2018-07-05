@@ -3,6 +3,8 @@ import tcod as libtcod
 
 
 def process_input(key):
+    ch = chr(key.c)
+
     if key.vk == libtcod.KEY_UP:
         return {'move': (0, -1)}
     elif key.vk == libtcod.KEY_DOWN:
@@ -11,6 +13,10 @@ def process_input(key):
         return {'move': (-1, 0)}
     elif key.vk == libtcod.KEY_RIGHT:
         return {'move': (1, 0)}
+
+    if ch == 'z':
+        return { 'light' : True }
+
 
     if key.vk == libtcod.KEY_ENTER and key.lalt:
         # Alt+Enter: toggle full screen

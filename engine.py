@@ -24,14 +24,15 @@ def main():
         'light_ground'  : libtcod.Color(200, 180, 50),
     }
 
-    ego = Entity(int(screen_width / 2), int(screen_height / 2), '@', libtcod.white)
-    npc = Entity(int(screen_width / 2) - 5, int(screen_height / 2), '@', libtcod.yellow)
-    actors = [npc, ego]
+    # ego = Entity(int(screen_width / 2), int(screen_height / 2), '@', libtcod.white)
+    # npc = Entity(int(screen_width / 2) - 5, int(screen_height / 2), '@', libtcod.yellow)
+    ego = Entity(0, 0, '@', libtcod.white)
+    actors = [ego]
 
     con = libtcod.console_new(screen_width, screen_height)
     fov_recompute = True
     game_map = GameMap(map_width, map_height)
-    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, ego)
+    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, ego, actors, 3)
 
     fov_recompute = True
     fov_map = initialize_fov(game_map)
@@ -57,6 +58,14 @@ def main():
         move = action.get('move')
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
+        light = action.get('light')
+
+        if light:
+            for y in range(game_map.height):
+                for x in range(game_map.width):
+                    game_map.tiles[x][y].explored = True
+                    fov_recompute = True
+
 
         if move and not game_map.is_blocked(ego.x + move[0], ego.y + move[1]):
             ego.move(move[0],move[1])
