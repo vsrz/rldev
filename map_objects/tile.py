@@ -8,6 +8,7 @@ class Tile:
         :param blocked_sight: If this tile blocks line of sight for things behind it
         """
         self.blocked = blocked
+        self.explored = False
 
         # If a tile is blocked, it should also be blocked sight
         if blocked_sight is None:
