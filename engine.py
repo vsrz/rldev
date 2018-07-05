@@ -64,7 +64,6 @@ def main():
             for y in range(game_map.height):
                 for x in range(game_map.width):
                     game_map.tiles[x][y].explored = True
-                    fov_recompute = True
 
 
         if move and not game_map.is_blocked(ego.x + move[0], ego.y + move[1]):
