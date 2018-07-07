@@ -24,9 +24,7 @@ def main():
         'light_ground'  : libtcod.Color(200, 180, 50),
     }
 
-    # ego = Entity(int(screen_width / 2), int(screen_height / 2), '@', libtcod.white)
-    # npc = Entity(int(screen_width / 2) - 5, int(screen_height / 2), '@', libtcod.yellow)
-    ego = Entity(0, 0, '@', libtcod.white)
+    ego = Entity(0, 0, '@', libtcod.white, 'Ego')
     actors = [ego]
 
     con = libtcod.console_new(screen_width, screen_height)
