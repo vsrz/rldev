@@ -5,6 +5,7 @@ from input_handler import *
 from map_objects.game_map import *
 from fov import *
 from vector import *
+from game_states import GameStates
 
 def main():
     screen_width = 80
@@ -41,6 +42,7 @@ def main():
     libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False)
     key = libtcod.Key()
     mouse = libtcod.Mouse()
+    game_state = GameStates.PLAYERS_TURN
 
     while not libtcod.console_is_window_closed():
 
@@ -68,17 +70,25 @@ def main():
                     fov_recompute = True
 
 
-        if move:
+        if move and game_state == GameStates.PLAYERS_TURN:
             dst = Vector2i(ego.x + move[0], ego.y + move[1])
             if not game_map.is_blocked(dst.x, dst.y) and not get_blocking_entities_at_location(entities, dst):
                 ego.move(move[0], move[1])
                 fov_recompute = True
+                game_state = GameStates.ENEMY_TURN
 
         if exit:
             return True
 
         if fullscreen:
             libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+
+        if game_state == GameStates.ENEMY_TURN:
+            for entity in entities:
+                if entity != ego:
+                    print(entity.name + '\'s turn')
+            game_state = GameStates.PLAYERS_TURN
+
 
 if __name__ == '__main__':
     main()
