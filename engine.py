@@ -48,9 +48,9 @@ def main():
 
         if fov_recompute:
             recompute_fov(fov_map, ego.x, ego.y, fov_radius, fov_light_walls, fov_algorithm)
-            fov_recompute = False
 
         render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
+        fov_recompute = False
         libtcod.console_flush()
         clear_all(con, entities)
 
