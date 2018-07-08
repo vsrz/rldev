@@ -16,7 +16,8 @@ class GameMap:
         tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
         return tiles
 
-    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, ego, entities, max_monsters_per_room):
+    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, ego, entities,
+                 max_monsters_per_room):
         rooms = []
         num_rooms = 0
 
@@ -98,9 +99,9 @@ class GameMap:
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
                 if randint(0,100) < 80:
-                    monster = Entity(x, y, 'o', libtcod.desaturated_green)
+                    monster = Entity(x, y, 'o', libtcod.desaturated_green, 'Orc', True)
                 else:
-                    monster = Entity(x, y, 'T', libtcod.darker_green)
+                    monster = Entity(x, y, 'T', libtcod.darker_green, 'Troll', True)
 
                 entities.append(monster)
 

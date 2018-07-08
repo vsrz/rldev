@@ -13,4 +13,10 @@ class Entity:
         self.y += dy
 
 
+def get_blocking_entities_at_location(entities, dest):
+    for entity in entities:
+        if entity.blocks and dest.x == entity.x and dest.y == entity.y:
+            return entity
+    return None
+
 

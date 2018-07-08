@@ -1,8 +1,10 @@
-from entity import Entity
+
+from entity import get_blocking_entities_at_location
 from renderer import *
 from input_handler import *
 from map_objects.game_map import *
 from fov import *
+from vector import *
 
 def main():
     screen_width = 80
@@ -12,10 +14,7 @@ def main():
     room_max_size = 10
     room_min_size = 6
     max_rooms = 30
-
-    fov_algorithm = 0
-    fov_light_walls = True
-    fov_radius = 10
+    max_monsters_per_room = 3
 
     colors = {
         'dark_wall'     : libtcod.Color(0, 0, 100),
@@ -24,14 +23,17 @@ def main():
         'light_ground'  : libtcod.Color(200, 180, 50),
     }
 
-    ego = Entity(0, 0, '@', libtcod.white, 'Ego')
-    actors = [ego]
+    ego = Entity(0, 0, '@', libtcod.white, 'Ego', False)
+    entities = [ego]
 
     con = libtcod.console_new(screen_width, screen_height)
-    fov_recompute = True
     game_map = GameMap(map_width, map_height)
-    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, ego, actors, 3)
+    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, ego, entities,
+                      max_monsters_per_room)
 
+    fov_algorithm = 0
+    fov_light_walls = True
+    fov_radius = 10
     fov_recompute = True
     fov_map = initialize_fov(game_map)
 
@@ -48,9 +50,9 @@ def main():
             recompute_fov(fov_map, ego.x, ego.y, fov_radius, fov_light_walls, fov_algorithm)
             fov_recompute = False
 
-        render_all(con, actors, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
+        render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
         libtcod.console_flush()
-        clear_all(con, actors)
+        clear_all(con, entities)
 
         action = process_input(key)
 
@@ -66,9 +68,11 @@ def main():
                     fov_recompute = True
 
 
-        if move and not game_map.is_blocked(ego.x + move[0], ego.y + move[1]):
-            ego.move(move[0],move[1])
-            fov_recompute = True
+        if move:
+            dst = Vector2i(ego.x + move[0], ego.y + move[1])
+            if not game_map.is_blocked(dst.x, dst.y) and not get_blocking_entities_at_location(entities, dst):
+                ego.move(move[0], move[1])
+                fov_recompute = True
 
         if exit:
             return True
