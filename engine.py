@@ -6,6 +6,7 @@ from map_objects.game_map import *
 from fov import *
 from vector import *
 from game_states import GameStates
+from components.fighter import Fighter
 
 def main():
     screen_width = 80
@@ -24,7 +25,7 @@ def main():
         'light_ground'  : libtcod.Color(200, 180, 50),
     }
 
-    ego = Entity(0, 0, '@', libtcod.white, 'Ego', False)
+    ego = Entity(0, 0, '@', libtcod.white, 'Ego', False, fighter=Fighter(hp=30, defense=2, power=5))
     entities = [ego]
 
     con = libtcod.console_new(screen_width, screen_height)
@@ -86,7 +87,8 @@ def main():
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
                 if entity != ego:
-                    print(entity.name + '\'s turn')
+                    if entity.ai:
+                        entity.ai.take_turn(ego, fov_map, game_map, entities)
             game_state = GameStates.PLAYERS_TURN
 
 
