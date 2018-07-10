@@ -73,11 +73,15 @@ def main():
 
         if move and game_state == GameStates.PLAYERS_TURN:
             dst = Vector2i(ego.x + move[0], ego.y + move[1])
-            if not game_map.is_blocked(dst.x, dst.y) and not get_blocking_entities_at_location(entities, dst):
-                ego.move(move[0], move[1])
-                fov_recompute = True
-                game_state = GameStates.ENEMY_TURN
+            if not game_map.is_blocked(dst.x, dst.y):
+                target = get_blocking_entities_at_location(entities, dst)
+                if target:
+                    ego.fighter.attack(target)
+                else:
+                    ego.move(move[0], move[1])
 
+                game_state = GameStates.ENEMY_TURN
+                fov_recompute = True
         if exit:
             return True
 
