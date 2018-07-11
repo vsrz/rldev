@@ -6,6 +6,7 @@ from entity import Entity
 import tcod as libtcod
 from components.ai import BasicMonster
 from components.fighter import Fighter
+from renderer import RenderOrder
 
 
 class GameMap:
@@ -103,13 +104,13 @@ class GameMap:
                 if randint(0,100) < 80:
                     compAiBasicMonster = BasicMonster()
                     compFighterOrc = Fighter(hp=16, defense=0, power=2)
-                    monster = Entity(x, y, 'o', libtcod.desaturated_green, 'Orc', True, compFighterOrc,
-                                     compAiBasicMonster)
+                    monster = Entity(x, y, 'o', libtcod.desaturated_green, 'Orc', True, fighter=compFighterOrc,
+                                     ai=compAiBasicMonster, render_order=RenderOrder.ACTOR)
                 else:
                     compFighterTroll = Fighter(hp=16, defense=1, power=4)
                     compAiBasicMonster = BasicMonster()
-                    monster = Entity(x, y, 'T', libtcod.darker_green, 'Troll', True, compFighterTroll,
-                                     compAiBasicMonster)
+                    monster = Entity(x, y, 'T', libtcod.darker_green, 'Troll', True, fighter=compFighterTroll,
+                                     ai=compAiBasicMonster, render_order=RenderOrder.ACTOR)
 
                 entities.append(monster)
 

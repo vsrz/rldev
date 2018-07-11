@@ -1,9 +1,11 @@
 import math
 from vector import Vector2i
 import tcod as libtcod
+from renderer import RenderOrder
 
 class Entity:
-    def __init__(self, x, y, char, color, name, blocks=False, fighter=None, ai=None):
+    def __init__(self, x, y, char, color, name, blocks=False, render_order = RenderOrder.CORPSE, fighter=None,
+                 ai=None):
         self.x = x
         self.y = y
         self.char = char
@@ -12,6 +14,7 @@ class Entity:
         self.blocks = blocks
         self.fighter = fighter
         self.ai = ai
+        self.render_order = render_order
 
         if self.fighter:
             self.fighter.owner = self

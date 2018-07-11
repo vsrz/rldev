@@ -7,6 +7,7 @@ from fov import *
 from vector import *
 from game_states import GameStates
 from components.fighter import Fighter
+from death_functions import *
 
 def main():
     screen_width = 80
@@ -25,7 +26,8 @@ def main():
         'light_ground'  : libtcod.Color(200, 180, 50),
     }
 
-    ego = Entity(0, 0, '@', libtcod.white, 'Ego', False, fighter=Fighter(hp=30, defense=2, power=5))
+    ego = Entity(0, 0, '@', libtcod.white, 'Ego', False, fighter=Fighter(hp=30, defense=2, power=5),
+                 render_order=RenderOrder.ACTOR)
     entities = [ego]
 
     con = libtcod.console_new(screen_width, screen_height)
@@ -52,7 +54,7 @@ def main():
         if fov_recompute:
             recompute_fov(fov_map, ego.x, ego.y, fov_radius, fov_light_walls, fov_algorithm)
 
-        render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
+        render_all(con, entities, ego, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
         fov_recompute = False
         libtcod.console_flush()
         clear_all(con, entities)
@@ -71,29 +73,65 @@ def main():
                     fov_recompute = True
 
 
+        player_turn_events = []
         if move and game_state == GameStates.PLAYERS_TURN:
             dst = Vector2i(ego.x + move[0], ego.y + move[1])
             if not game_map.is_blocked(dst.x, dst.y):
                 target = get_blocking_entities_at_location(entities, dst)
                 if target:
-                    ego.fighter.attack(target)
+                    attack_results = ego.fighter.attack(target)
+                    player_turn_events.extend(attack_results)
                 else:
                     ego.move(move[0], move[1])
 
                 game_state = GameStates.ENEMY_TURN
                 fov_recompute = True
+
         if exit:
             return True
+
+        for event in player_turn_events:
+            message = event.get('message')
+            dead_entity = event.get('dead')
+
+            if message:
+                print(message)
+            if dead_entity:
+                if dead_entity == ego:
+                    message, game_state = kill_player(dead_entity)
+                else:
+                    message = kill_monster(dead_entity)
+
+            print (message)
+
+
 
         if fullscreen:
             libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
-                if entity != ego:
-                    if entity.ai:
-                        entity.ai.take_turn(ego, fov_map, game_map, entities)
-            game_state = GameStates.PLAYERS_TURN
+                if entity.ai:
+                    enemy_turn_events = entity.ai.take_turn(ego, fov_map, game_map, entities)
+                    for event in enemy_turn_events:
+                        message = event.get('message')
+                        dead_entity = event.get('dead')
+
+                        if message:
+                            print(message)
+
+                        if dead_entity:
+                            if dead_entity == ego:
+                                message, game_state = kill_player(dead_entity)
+                            else:
+                                message = kill_monster(dead_entity)
+                            print(message)
+                            if game_state == GameStates.PLAYER_DEAD:
+                                break;
+                    if game_state == GameStates.PLAYER_DEAD:
+                        break;
+            else:
+                game_state = GameStates.PLAYERS_TURN
 
 
 if __name__ == '__main__':
